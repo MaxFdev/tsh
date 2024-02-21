@@ -182,7 +182,7 @@ void eval(char *cmdline)
     pid_t pid;
     // TODO sigset mask thing
     // sigset_t mask;
-    
+
     // parse input and get bg indicator
     bg = parseline(cmdline, argv);
     if (argv[0] == NULL)
@@ -195,8 +195,8 @@ void eval(char *cmdline)
         // sigemptyset(&mask);
         // sigaddset(&mask, SIGCHLD);
         // sigprocmask(SIG_BLOCK, &mask, NULL);
-        
         // TODO deal with forking
+
         // if ((pid = fork()) == 0) {
         //     // Child process
         //     // Unblock SIGCHLD
@@ -334,11 +334,12 @@ void do_bgfg(char **argv)
     if (argv[1] == NULL)
     {
         printf("%s command requires PID or %cjobid argument\n", argv[0], '%');
+        return;
     }
     else
     {
         bg = strcmp(argv[0], "bg") == 0 ? 1 : 0;
-        
+
         if (argv[1][0] == '%')
         {
             jid = atoi(argv[1] + 1); // TODO test this
@@ -346,6 +347,7 @@ void do_bgfg(char **argv)
             if (job == NULL)
             {
                 printf("%s: No such job\n", argv[1]);
+                return;
             }
         }
         else if (atoi(argv[1]) > 0)
@@ -355,21 +357,41 @@ void do_bgfg(char **argv)
             if (job == NULL)
             {
                 printf("%s: No such process\n", argv[1]);
+                return;
             }
         }
         else
         {
             printf("%s: argument must be a PID or %cjobid\n", argv[0], '%');
+            return;
         }
 
         // TODO stop the process or continue it in bg/fg
         if (bg)
         {
-            
+            // TODO continue in the background
+            // if (kill(-(job->pid), SIGCONT) < 0)
+            // {
+            //     printf("kill error\n");
+            // }
+            // else
+            // {
+            //     printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
+            //     job->state = BG;
+            // }
         }
         else
         {
-
+            // TODO continue in the foreground
+            // if (kill(-(job->pid), SIGCONT) < 0)
+            // {
+            //     printf("kill error\n");
+            // }
+            // else
+            // {
+            //     job->state = FG;
+            //     waitfg(job->pid);
+            // }
         }
     }
 }
@@ -379,7 +401,35 @@ void do_bgfg(char **argv)
  */
 void waitfg(pid_t pid)
 {
-    return;
+    // TODO start working on this
+    // struct job_t *job;
+    // int status;
+
+    // // Get the job from the job list
+    // job = getjobpid(jobs, pid);
+    // if (job == NULL)
+    //     return;
+
+    // // Wait for the job to no longer be in the foreground
+    // while (pid == fgpid(jobs))
+    // {
+    //     sleep(1);
+    // }
+
+    // // Check if the process has stopped or terminated
+    // if (waitpid(pid, &status, WNOHANG | WUNTRACED) > 0)
+    // {
+    //     if (WIFSTOPPED(status))
+    //     {
+    //         // The process has stopped
+    //         job->state = ST;
+    //     }
+    //     else if (WIFEXITED(status) || WIFSIGNALED(status))
+    //     {
+    //         // The process has terminated
+    //         deletejob(jobs, pid);
+    //     }
+    // }
 }
 
 /*****************
@@ -395,8 +445,29 @@ void waitfg(pid_t pid)
  */
 void sigchld_handler(int sig)
 {
-    // TODO start this
-    return;
+    // TODO work on this
+    // int status;
+    // pid_t pid;
+
+    // // Reap all available zombie children
+    // while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0)
+    // {
+    //     if (WIFEXITED(status) || WIFSIGNALED(status))
+    //     {
+    //         // The child terminated normally or was terminated by a signal
+    //         deletejob(jobs, pid);
+    //     }
+    //     else if (WIFSTOPPED(status))
+    //     {
+    //         // The child was stopped by a signal
+    //         getjobpid(jobs, pid)->state = ST;
+    //     }
+    // }
+
+    // if (errno != ECHILD)
+    // {
+    //     unix_error("waitpid error");
+    // }
 }
 
 // TODO test the sig handlers:
