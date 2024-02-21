@@ -192,15 +192,39 @@ void eval(char *cmdline)
     if (!builtin_cmd(argv))
     {
         // TODO handel signal stuff
+        // sigemptyset(&mask);
+        // sigaddset(&mask, SIGCHLD);
+        // sigprocmask(SIG_BLOCK, &mask, NULL);
         
-        // check if it should run in the background
-        // TODO finish the rest
-        if (bg)
-        {
-        }
-        else
-        {
-        }
+        // TODO deal with forking
+        // if ((pid = fork()) == 0) {
+        //     // Child process
+        //     // Unblock SIGCHLD
+        //     sigprocmask(SIG_UNBLOCK, &mask, NULL);
+
+        //     // Set new process group
+        //     setpgid(0, 0);
+
+        //     // Execute the command
+        //     if (execve(argv[0], argv, environ) < 0) {
+        //         printf("%s: Command not found.\n", argv[0]);
+        //         exit(0);
+        //     }
+        // }
+
+        // TODO deal with the new child process
+        // // Add the child to the job list
+        // addjob(jobs, pid, (bg ? BG : FG), cmdline);
+
+        // // Unblock SIGCHLD
+        // sigprocmask(SIG_UNBLOCK, &mask, NULL);
+
+        // TODO deal with background vs foreground
+        // if (!bg) {
+        //     waitfg(pid);
+        // } else {
+        //     printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
+        // }
     }
 }
 
