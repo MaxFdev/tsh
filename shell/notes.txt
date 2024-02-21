@@ -58,6 +58,10 @@ think carefully)
 3. Waiting for foreground job - think carefully about what the 
 right way to do this is
 
+to compare output: diff < (make testxx) < (make rtestxx)
+
+ch 8 in cs:app
+
 -----
 Summary:
 Use SIGCONT to continue after a SIGTSTP. SIGINT/SIGTSTP are only 
