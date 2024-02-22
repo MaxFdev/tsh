@@ -197,24 +197,22 @@ void eval(char *cmdline)
         // sigprocmask(SIG_BLOCK, &mask, NULL);
 
         // TODO deal with forking
-        if ((pid = fork()) == 0) {
-        //     // Child process
-        //     // Unblock SIGCHLD
-        //     sigprocmask(SIG_UNBLOCK, &mask, NULL);
+        if ((pid = fork()) == 0)
+        {
+            //     // Child process
+            //     // Unblock SIGCHLD
+            //     sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
-        //     // Set new process group
-        //     setpgid(0, 0);
+            //     // Set new process group
+            //     setpgid(0, 0);
 
-        //     // Execute the command
-            if (execve(argv[0], argv, environ) < 0) {
+            //     // Execute the command
+            if (execve(argv[0], argv, environ) < 0)
+            {
                 printf("%s: Command not found\n", argv[0]);
                 exit(1);
             }
         }
-
-        // TODO deal with the new child process
-        // // Add the child to the job list
-        // addjob(jobs, pid, (bg ? BG : FG), cmdline);
 
         // // Unblock SIGCHLD
         // sigprocmask(SIG_UNBLOCK, &mask, NULL);
@@ -223,10 +221,13 @@ void eval(char *cmdline)
         addjob(jobs, pid, bg ? BG : FG, cmdline);
 
         // TODO deal with background vs foreground
-        if (!bg) {
+        if (!bg)
+        {
             // wait for the job to finish in foreground
             waitfg(pid);
-        } else {
+        }
+        else
+        {
             // print a confirmation for background job
             printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
         }
@@ -410,8 +411,9 @@ void waitfg(pid_t pid)
     // struct job_t *job;
     int status;
 
-    // todo testing update later
     waitpid(pid, &status, WUNTRACED);
+
+    deletejob(jobs, pid);
 
     //// Get the job from the job list
     // job = getjobpid(jobs, pid);
@@ -454,8 +456,18 @@ void waitfg(pid_t pid)
 void sigchld_handler(int sig)
 {
     // TODO work on this
-    // int status;
-    // pid_t pid;
+    pid_t pid;
+    int status;
+    int more = 1;
+
+    while (more)
+    {
+        more = (pid = waitpid(-1, &status, WNOHANG)) > 0;
+        if (WIFEXITED(status))
+        {
+            deletejob(jobs, pid);
+        }
+    }
 
     // // Reap all available zombie children
     // while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0)
