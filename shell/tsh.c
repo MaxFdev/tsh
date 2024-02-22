@@ -221,9 +221,12 @@ void eval(char *cmdline)
 
         // TODO deal with background vs foreground
         if (!bg) {
+            // wait for the job to finish in foreground
             waitfg(pid);
-        // } else {
-        //     printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
+        } else {
+            // add the job to the job list and print a confirmation
+            addjob(jobs, pid, bg ? BG : FG, cmdline);
+            printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
         }
     }
 }
