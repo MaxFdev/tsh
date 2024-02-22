@@ -62,6 +62,17 @@ to compare output: diff < (make testxx) < (make rtestxx)
 
 ch 8 in cs:app
 
+Line estimates:
+• eval: Main routine that parses and interprets the command 
+ line. [70 lines]
+• builtincmd: Recognizes and interprets the built-in commands: 
+ quit, fg, bg, and jobs. [25 lines]
+• dobgfg: Implements the bg and fg built-in commands. [50 lines]
+• waitfg: Waits for a foreground job to complete. [20 lines]
+• sigchldhandler: Catches SIGCHILD signals. [80 lines]
+• siginthandler: Catches SIGINT (ctrl-c) signals. [15 lines]
+• sigtstphandler: Catches SIGTSTP (ctrl-z) signals. [15 lines]
+
 -----
 Summary:
 Use SIGCONT to continue after a SIGTSTP. SIGINT/SIGTSTP are only 
