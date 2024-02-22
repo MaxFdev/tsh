@@ -219,13 +219,15 @@ void eval(char *cmdline)
         // // Unblock SIGCHLD
         // sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
+        // add the job to the job list
+        addjob(jobs, pid, bg ? BG : FG, cmdline);
+
         // TODO deal with background vs foreground
         if (!bg) {
             // wait for the job to finish in foreground
             waitfg(pid);
         } else {
-            // add the job to the job list and print a confirmation
-            addjob(jobs, pid, bg ? BG : FG, cmdline);
+            // print a confirmation for background job
             printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
         }
     }
