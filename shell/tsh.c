@@ -375,16 +375,16 @@ void do_bgfg(char **argv)
         // TODO stop the process or continue it in bg/fg
         if (bg)
         {
-            // TODO continue in the background
-            // if (kill(-(job->pid), SIGCONT) < 0)
-            // {
-            //     printf("kill error\n");
-            // }
-            // else
-            // {
-            //     printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
-            //     job->state = BG;
-            // }
+            // continue in the background
+            if (kill(-(job->pid), SIGCONT) < 0)
+            {
+                unix_error("continue in background error");
+            }
+            else
+            {
+                printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
+                job->state = BG;
+            }
         }
         else
         {
