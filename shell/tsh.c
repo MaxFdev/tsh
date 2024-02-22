@@ -195,9 +195,9 @@ void eval(char *cmdline)
         // sigemptyset(&mask);
         // sigaddset(&mask, SIGCHLD);
         // sigprocmask(SIG_BLOCK, &mask, NULL);
-        // TODO deal with forking
 
-        // if ((pid = fork()) == 0) {
+        // TODO deal with forking
+        if ((pid = fork()) == 0) {
         //     // Child process
         //     // Unblock SIGCHLD
         //     sigprocmask(SIG_UNBLOCK, &mask, NULL);
@@ -206,11 +206,11 @@ void eval(char *cmdline)
         //     setpgid(0, 0);
 
         //     // Execute the command
-        //     if (execve(argv[0], argv, environ) < 0) {
-        //         printf("%s: Command not found.\n", argv[0]);
-        //         exit(0);
-        //     }
-        // }
+            if (execve(argv[0], argv, environ) < 0) {
+                printf("%s: Command not found\n", argv[0]);
+                exit(1);
+            }
+        }
 
         // TODO deal with the new child process
         // // Add the child to the job list
@@ -220,11 +220,11 @@ void eval(char *cmdline)
         // sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
         // TODO deal with background vs foreground
-        // if (!bg) {
-        //     waitfg(pid);
+        if (!bg) {
+            waitfg(pid);
         // } else {
         //     printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
-        // }
+        }
     }
 }
 
@@ -300,7 +300,7 @@ int builtin_cmd(char **argv)
 {
     if (strcmp(argv[0], "quit") == 0)
     {
-        exit(0); // TODO make sure everything gets closed
+        exit(0);
     }
     else if (strcmp(argv[0], "jobs") == 0)
     {
@@ -403,9 +403,12 @@ void waitfg(pid_t pid)
 {
     // TODO start working on this
     // struct job_t *job;
-    // int status;
+    int status;
 
-    // // Get the job from the job list
+    // todo testing update later
+    waitpid(pid, &status, WUNTRACED);
+
+    //// Get the job from the job list
     // job = getjobpid(jobs, pid);
     // if (job == NULL)
     //     return;
@@ -470,7 +473,7 @@ void sigchld_handler(int sig)
     // }
 }
 
-// TODO test the sig handlers:
+// TODO test the sig handlers & comment:
 
 /*
  * sigint_handler - The kernel sends a SIGINT to the shell whenever the
@@ -526,7 +529,7 @@ void sigtstp_handler(int sig)
     }
 }
 
-// TODO are these allowed:
+// TODO are these allowed & comment:
 
 void better_write(char *str, int size)
 {
