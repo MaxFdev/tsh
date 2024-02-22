@@ -220,7 +220,7 @@ void eval(char *cmdline)
         // add the job to the job list
         addjob(jobs, pid, bg ? BG : FG, cmdline);
 
-        // TODO deal with background vs foreground
+        // deal with background vs foreground
         if (!bg)
         {
             // wait for the job to finish in foreground
@@ -306,31 +306,38 @@ int builtin_cmd(char **argv)
 {
     if (strcmp(argv[0], "quit") == 0)
     {
+        // exit the terminal
         exit(0);
     }
     else if (strcmp(argv[0], "jobs") == 0)
     {
-        listjobs(jobs); // list the jobs
+        // list the jobs
+        listjobs(jobs);
     }
     else if (strcmp(argv[0], "bg") == 0)
     {
-        do_bgfg(argv); // hand off to do_bgfg
+        // hand off to do_bgfg for bg
+        do_bgfg(argv);
     }
     else if (strcmp(argv[0], "fg") == 0)
     {
-        do_bgfg(argv); // hand off to do_bgfg
+        // hand off to do_bgfg for fg
+        do_bgfg(argv);
     }
     else
     {
-        return 0; // Not a builtin command
+        // Not a builtin command
+        return 0;
     }
-    return 1; // Was a builtin command
+    
+    // Was a builtin command
+    return 1;
 }
 
 /*
  * do_bgfg - Execute the builtin bg and fg commands
  */
-void do_bgfg(char **argv)
+void do_bgfg(char **argv) // TODO comment this
 {
     int bg;
     int jid;
@@ -348,7 +355,7 @@ void do_bgfg(char **argv)
 
         if (argv[1][0] == '%')
         {
-            jid = atoi(argv[1] + 1); // TODO test this
+            jid = atoi(argv[1] + 1);
             job = getjobjid(jobs, jid);
             if (job == NULL)
             {
@@ -407,7 +414,7 @@ void do_bgfg(char **argv)
  */
 void waitfg(pid_t pid)
 {
-    // TODO start working on this
+    // TODO comment and finish this
 
     // get the job
     struct job_t *job = getjobpid(jobs, pid);
@@ -451,7 +458,8 @@ void waitfg(pid_t pid)
  */
 void sigchld_handler(int sig)
 {
-    // TODO work on this
+    // TODO comment this
+
     struct job_t *job;
     pid_t pid;
     int jid;
@@ -494,7 +502,7 @@ void sigchld_handler(int sig)
         }
     }
 
-    // todo handle errors from waitpid
+    // TODO handle errors from waitpid
     // if (pid == -1)
     // {
     //     unix_error("waiting fail for pid failed");
@@ -539,14 +547,6 @@ void sigint_handler(int sig)
         {
             unix_error("Failed to interrupt");
         }
-        // else if (deletejob(jobs, fg_pid)) // todo is this needed?
-        // {
-        //     better_write("Job [", 5);
-        //     write_int(fg_jid);
-        //     better_write("] (", 3);
-        //     write_int(fg_pid);
-        //     better_write(") terminated by signal 2\n", 25);
-        // }
     }
 }
 
@@ -562,22 +562,14 @@ void sigtstp_handler(int sig)
 
     if (fg_pid > 0)
     {
-        if (kill(-fg_pid, SIGTSTP) == -1) // todo should the pid be -pid for group?
+        if (kill(-fg_pid, SIGTSTP) == -1)
         {
             unix_error("Failed to stop");
         }
-        // else if (deletejob(jobs, fg_pid)) // TODO update not delete & move to sigchld
-        // {
-        //     better_write("Job [", 5);
-        //     write_int(fg_jid);
-        //     better_write("] (", 3);
-        //     write_int(fg_pid);
-        //     better_write(") terminated by signal 20\n", 26);
-        // }
     }
 }
 
-// TODO are these allowed & comment:
+// TODO are these 2 functions allowed & comment:
 
 void better_write(char *str, int size)
 {
