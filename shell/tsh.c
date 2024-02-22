@@ -203,10 +203,10 @@ void eval(char *cmdline)
             //     // Unblock SIGCHLD
             //     sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
-            //     // Set new process group
-            //     setpgid(0, 0);
+            // Set new process group
+            setpgid(0, 0);
 
-            //     // Execute the command
+            // Execute the command
             if (execve(argv[0], argv, environ) < 0)
             {
                 printf("%s: Command not found\n", argv[0]);
@@ -408,23 +408,19 @@ void do_bgfg(char **argv)
 void waitfg(pid_t pid)
 {
     // TODO start working on this
-    // struct job_t *job;
-    int status;
 
-    waitpid(pid, &status, WUNTRACED);
+    // get the job
+    struct job_t *job = getjobpid(jobs, pid);
 
-    deletejob(jobs, pid);
+    // return if the job has already completed
+    if (job == NULL)
+        return;
 
-    //// Get the job from the job list
-    // job = getjobpid(jobs, pid);
-    // if (job == NULL)
-    //     return;
-
-    // // Wait for the job to no longer be in the foreground
-    // while (pid == fgpid(jobs))
-    // {
-    //     sleep(1);
-    // }
+    // wait for job state and check for the same process
+    while (job->state == FG && job->pid == pid)
+    {
+        sleep(1);
+    }
 
     // // Check if the process has stopped or terminated
     // if (waitpid(pid, &status, WNOHANG | WUNTRACED) > 0)
@@ -535,7 +531,7 @@ void sigtstp_handler(int sig)
         {
             unix_error("Failed to stop");
         }
-        else if (deletejob(jobs, fg_pid))
+        else if (deletejob(jobs, fg_pid)) // TODO update not delete
         {
             better_write("Job [", 5);
             write_int(fg_jid);
