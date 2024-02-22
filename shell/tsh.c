@@ -388,16 +388,16 @@ void do_bgfg(char **argv)
         }
         else
         {
-            // TODO continue in the foreground
-            // if (kill(-(job->pid), SIGCONT) < 0)
-            // {
-            //     printf("kill error\n");
-            // }
-            // else
-            // {
-            //     job->state = FG;
-            //     waitfg(job->pid);
-            // }
+            // continue in the foreground
+            if (kill(-(job->pid), SIGCONT) < 0)
+            {
+                unix_error("continue in the foreground error");
+            }
+            else
+            {
+                job->state = FG;
+                waitfg(job->pid);
+            }
         }
     }
 }
