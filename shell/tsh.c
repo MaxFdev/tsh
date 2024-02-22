@@ -453,16 +453,32 @@ void sigchld_handler(int sig)
 {
     // TODO work on this
     pid_t pid;
+    int jid;
     int status;
     int more = 1;
 
     while (more)
     {
         more = (pid = waitpid(-1, &status, WNOHANG)) > 0;
+        jid = pid2jid(pid);
         if (WIFEXITED(status))
         {
             deletejob(jobs, pid);
         }
+        if (WIFSIGNALED(status))
+        {
+            if (deletejob(jobs, pid))
+            {
+                better_write("Job [", 5);
+                write_int(jid);
+                better_write("] (", 3);
+                write_int(pid);
+                better_write(") terminated by signal ", 23);
+                write_int(WTERMSIG(status));
+                better_write("\n", 1);
+            }
+        }
+        
     }
 
     // // Reap all available zombie children
@@ -496,7 +512,7 @@ void sigchld_handler(int sig)
 void sigint_handler(int sig)
 {
     pid_t fg_pid = fgpid(jobs);
-    int fg_jid = pid2jid(fg_pid);
+    // int fg_jid = pid2jid(fg_pid);
 
     if (fg_pid > 0)
     {
@@ -504,14 +520,14 @@ void sigint_handler(int sig)
         {
             unix_error("Failed to interrupt");
         }
-        else if (deletejob(jobs, fg_pid))
-        {
-            better_write("Job [", 5);
-            write_int(fg_jid);
-            better_write("] (", 3);
-            write_int(fg_pid);
-            better_write(") terminated by signal 2\n", 26);
-        }
+        // else if (deletejob(jobs, fg_pid)) // todo is this needed?
+        // {
+        //     better_write("Job [", 5);
+        //     write_int(fg_jid);
+        //     better_write("] (", 3);
+        //     write_int(fg_pid);
+        //     better_write(") terminated by signal 2\n", 25);
+        // }
     }
 }
 
@@ -523,7 +539,7 @@ void sigint_handler(int sig)
 void sigtstp_handler(int sig)
 {
     pid_t fg_pid = fgpid(jobs);
-    int fg_jid = pid2jid(fg_pid);
+    // int fg_jid = pid2jid(fg_pid);
 
     if (fg_pid > 0)
     {
@@ -531,14 +547,14 @@ void sigtstp_handler(int sig)
         {
             unix_error("Failed to stop");
         }
-        else if (deletejob(jobs, fg_pid)) // TODO update not delete
-        {
-            better_write("Job [", 5);
-            write_int(fg_jid);
-            better_write("] (", 3);
-            write_int(fg_pid);
-            better_write(") terminated by signal 20\n", 26);
-        }
+        // else if (deletejob(jobs, fg_pid)) // TODO update not delete & move to sigchld
+        // {
+        //     better_write("Job [", 5);
+        //     write_int(fg_jid);
+        //     better_write("] (", 3);
+        //     write_int(fg_pid);
+        //     better_write(") terminated by signal 20\n", 26);
+        // }
     }
 }
 
