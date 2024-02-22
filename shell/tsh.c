@@ -452,6 +452,7 @@ void waitfg(pid_t pid)
 void sigchld_handler(int sig)
 {
     // TODO work on this
+    struct job_t *job;
     pid_t pid;
     int jid;
     int status;
@@ -459,13 +460,13 @@ void sigchld_handler(int sig)
 
     while (more)
     {
-        more = (pid = waitpid(-1, &status, WNOHANG)) > 0;
+        more = (pid = waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0;
         jid = pid2jid(pid);
         if (WIFEXITED(status))
         {
             deletejob(jobs, pid);
         }
-        if (WIFSIGNALED(status))
+        else if (WIFSIGNALED(status))
         {
             if (deletejob(jobs, pid))
             {
@@ -478,7 +479,21 @@ void sigchld_handler(int sig)
                 better_write("\n", 1);
             }
         }
-        
+        else if (WIFSTOPPED(status))
+        {
+            job = getjobpid(jobs, pid);
+            if (job != NULL)
+            {
+                job->state = ST;
+                better_write("Job [", 5);
+                write_int(jid);
+                better_write("] (", 3);
+                write_int(pid);
+                better_write(") stopped by signal ", 20);
+                write_int(WSTOPSIG(status));
+                better_write("\n", 1);
+            }
+        }
     }
 
     // // Reap all available zombie children
@@ -543,7 +558,7 @@ void sigtstp_handler(int sig)
 
     if (fg_pid > 0)
     {
-        if (kill(-fg_pid, SIGTSTP) == -1)
+        if (kill(-fg_pid, SIGTSTP) == -1) // todo should the pid be -pid for group?
         {
             unix_error("Failed to stop");
         }
