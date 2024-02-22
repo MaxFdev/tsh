@@ -456,11 +456,9 @@ void sigchld_handler(int sig)
     pid_t pid;
     int jid;
     int status;
-    int more = 1;
 
-    while (more)
+    while ((pid = waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0)
     {
-        more = (pid = waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0;
         jid = pid2jid(pid);
         if (WIFEXITED(status))
         {
@@ -495,6 +493,12 @@ void sigchld_handler(int sig)
             }
         }
     }
+
+    // todo handle errors from waitpid
+    // if (pid == -1)
+    // {
+    //     unix_error("waiting fail for pid failed");
+    // }
 
     // // Reap all available zombie children
     // while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0)
