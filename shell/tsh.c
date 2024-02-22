@@ -369,7 +369,7 @@ void do_bgfg(char **argv) // TODO comment this
             job = getjobpid(jobs, pid);
             if (job == NULL)
             {
-                printf("%s: No such process\n", argv[1]);
+                printf("(%s): No such process\n", argv[1]);
                 return;
             }
         }
