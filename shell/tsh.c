@@ -175,8 +175,7 @@ int main(int argc, char **argv)
  */
 void eval(char *cmdline)
 {
-    // TODO what other vars are needed?
-    // arg list and bg indicator
+    // set up local variables
     char *argv[MAXARGS];
     int bg;
     pid_t pid;
@@ -337,7 +336,7 @@ int builtin_cmd(char **argv)
 /*
  * do_bgfg - Execute the builtin bg and fg commands
  */
-void do_bgfg(char **argv) // TODO comment this
+void do_bgfg(char **argv)
 {
     // set up the local variables
     int jid;
@@ -461,8 +460,7 @@ void waitfg(pid_t pid)
  */
 void sigchld_handler(int sig)
 {
-    // TODO comment this
-    // set up all needed variables
+    // set up all local variables
     struct job_t *job;
     pid_t pid;
     int jid;
@@ -559,7 +557,7 @@ void sigtstp_handler(int sig)
     }
 }
 
-// TODO are these 2 functions allowed & comment:
+// TODO are these 2 functions allowed & update comment:
 
 void better_write(char *str, int size)
 {
