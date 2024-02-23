@@ -329,7 +329,7 @@ int builtin_cmd(char **argv)
         // Not a builtin command
         return 0;
     }
-    
+
     // Was a builtin command
     return 1;
 }
@@ -339,71 +339,89 @@ int builtin_cmd(char **argv)
  */
 void do_bgfg(char **argv) // TODO comment this
 {
-    int bg;
+    // set up the local variables
     int jid;
     pid_t pid;
     struct job_t *job;
 
+    // confirm whether there is a second argument
     if (argv[1] == NULL)
     {
+        // print error for not having a second argument and return
         printf("%s command requires PID or %cjobid argument\n", argv[0], '%');
         return;
     }
     else
     {
-        bg = strcmp(argv[0], "bg") == 0 ? 1 : 0;
-
+        // check if the second arg is a job
         if (argv[1][0] == '%')
         {
+            // convert the job number part to an int
             jid = atoi(argv[1] + 1);
+
+            // get the job based on its job number
             job = getjobjid(jobs, jid);
+
+            // check that the job exists
             if (job == NULL)
             {
+                // print error for non-existing job and return
                 printf("%s: No such job\n", argv[1]);
                 return;
             }
         }
-        else if (atoi(argv[1]) > 0)
+        // check for a process id number
+        else if ((pid = atoi(argv[1])) > 0)
         {
-            pid = atoi(argv[1]);
+            // get the job based on the process id
             job = getjobpid(jobs, pid);
+
+            // check that the job exists
             if (job == NULL)
             {
+                // print error for non-existing job and return
                 printf("(%s): No such process\n", argv[1]);
                 return;
             }
         }
         else
         {
+            // print error for not being a job id or pid and return
             printf("%s: argument must be a PID or %cjobid\n", argv[0], '%');
             return;
         }
 
-        // TODO stop the process or continue it in bg/fg
-        if (bg)
+        // check if the process is moving to the background or foreground
+        if (strcmp(argv[0], "fg"))
         {
-            // continue in the background
-            if (kill(-(job->pid), SIGCONT) < 0)
+            // send the continue signal to the process
+            if (kill(-(job->pid), SIGCONT) == 0)
             {
-                unix_error("continue in background error");
+                // change the job state to background
+                job->state = BG;
+                
+                // print a confirmation that the job is running
+                printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
             }
             else
             {
-                printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
-                job->state = BG;
+                unix_error("continue in background error");
             }
         }
         else
         {
             // continue in the foreground
-            if (kill(-(job->pid), SIGCONT) < 0)
+            if (kill(-(job->pid), SIGCONT) == 0)
             {
-                unix_error("continue in the foreground error");
+                // set the job state to foreground
+                job->state = FG;
+
+                // wait for the job to finish in the foreground
+                waitfg(job->pid);
             }
             else
             {
-                job->state = FG;
-                waitfg(job->pid);
+                unix_error("continue in the foreground error");
             }
         }
     }
@@ -414,35 +432,20 @@ void do_bgfg(char **argv) // TODO comment this
  */
 void waitfg(pid_t pid)
 {
-    // TODO comment and finish this
-
-    // get the job
+    // get and store the job
     struct job_t *job = getjobpid(jobs, pid);
 
     // return if the job has already completed
     if (job == NULL)
+    {
         return;
+    }
 
-    // wait for job state and check for the same process
+    // wait for job to leave foreground and check that process is the same
     while (job->state == FG && job->pid == pid)
     {
         sleep(1);
     }
-
-    // // Check if the process has stopped or terminated
-    // if (waitpid(pid, &status, WNOHANG | WUNTRACED) > 0)
-    // {
-    //     if (WIFSTOPPED(status))
-    //     {
-    //         // The process has stopped
-    //         job->state = ST;
-    //     }
-    //     else if (WIFEXITED(status) || WIFSIGNALED(status))
-    //     {
-    //         // The process has terminated
-    //         deletejob(jobs, pid);
-    //     }
-    // }
 }
 
 /*****************
@@ -459,21 +462,28 @@ void waitfg(pid_t pid)
 void sigchld_handler(int sig)
 {
     // TODO comment this
-
+    // set up all needed variables
     struct job_t *job;
     pid_t pid;
     int jid;
     int status;
 
-    while ((pid = waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0)
+    // check if any child process changes state
+    while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0)
     {
+        // get the job id for later
         jid = pid2jid(pid);
+
+        // check if the process finished
         if (WIFEXITED(status))
         {
+            // delete the job
             deletejob(jobs, pid);
         }
+        // check if the process was interrupted
         else if (WIFSIGNALED(status))
         {
+            // delete the job and print the confirmation
             if (deletejob(jobs, pid))
             {
                 better_write("Job [", 5);
@@ -485,9 +495,13 @@ void sigchld_handler(int sig)
                 better_write("\n", 1);
             }
         }
+        // check if the process was stopped
         else if (WIFSTOPPED(status))
         {
+            // get the job for processing
             job = getjobpid(jobs, pid);
+
+            // check the job exists and print a stop confirmation
             if (job != NULL)
             {
                 job->state = ST;
@@ -501,35 +515,7 @@ void sigchld_handler(int sig)
             }
         }
     }
-
-    // TODO handle errors from waitpid
-    // if (pid == -1)
-    // {
-    //     unix_error("waiting fail for pid failed");
-    // }
-
-    // // Reap all available zombie children
-    // while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0)
-    // {
-    //     if (WIFEXITED(status) || WIFSIGNALED(status))
-    //     {
-    //         // The child terminated normally or was terminated by a signal
-    //         deletejob(jobs, pid);
-    //     }
-    //     else if (WIFSTOPPED(status))
-    //     {
-    //         // The child was stopped by a signal
-    //         getjobpid(jobs, pid)->state = ST;
-    //     }
-    // }
-
-    // if (errno != ECHILD)
-    // {
-    //     unix_error("waitpid error");
-    // }
 }
-
-// TODO test the sig handlers & comment:
 
 /*
  * sigint_handler - The kernel sends a SIGINT to the shell whenever the
@@ -538,14 +524,16 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig)
 {
+    // get the current fg job's pid
     pid_t fg_pid = fgpid(jobs);
-    // int fg_jid = pid2jid(fg_pid);
 
+    // check that the process exists
     if (fg_pid > 0)
     {
+        // send the interrupt signal to the process
         if (kill(-fg_pid, SIGINT) == -1)
         {
-            unix_error("Failed to interrupt");
+            unix_error("Failed to interrupt"); // TODO should this be switched to something that is async-signal-safe
         }
     }
 }
@@ -557,14 +545,16 @@ void sigint_handler(int sig)
  */
 void sigtstp_handler(int sig)
 {
+    // get the current fg job's pid
     pid_t fg_pid = fgpid(jobs);
-    // int fg_jid = pid2jid(fg_pid);
 
+    // check that the process exists
     if (fg_pid > 0)
     {
+        // send the stop signal to the process
         if (kill(-fg_pid, SIGTSTP) == -1)
         {
-            unix_error("Failed to stop");
+            unix_error("Failed to stop"); // TODO should this be switched to something that is async-signal-safe
         }
     }
 }
@@ -575,7 +565,7 @@ void better_write(char *str, int size)
 {
     if (write(STDOUT_FILENO, str, size) == -1)
     {
-        unix_error("Write error");
+        unix_error("Write error"); // TODO should this be switched to something that is async-signal-safe
     }
 }
 
