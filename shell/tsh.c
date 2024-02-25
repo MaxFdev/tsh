@@ -66,8 +66,8 @@ void sigint_handler(int sig);
 
 // TODO are these allowed:
 
-void better_write(char *str, int size);
-void write_int(int value);
+void safe_write(char *str, int size);
+void safe_write_int(int value);
 
 /* Here are helper routines that we've provided for you */
 int parseline(const char *cmdline, char **argv);
@@ -313,14 +313,9 @@ int builtin_cmd(char **argv)
         // list the jobs
         listjobs(jobs);
     }
-    else if (strcmp(argv[0], "bg") == 0)
+    else if (strcmp(argv[0], "bg") == 0 || strcmp(argv[0], "fg") == 0)
     {
-        // hand off to do_bgfg for bg
-        do_bgfg(argv);
-    }
-    else if (strcmp(argv[0], "fg") == 0)
-    {
-        // hand off to do_bgfg for fg
+        // hand off to do_bgfg
         do_bgfg(argv);
     }
     else
@@ -355,16 +350,13 @@ void do_bgfg(char **argv)
         // check if the second arg is a job
         if (argv[1][0] == '%')
         {
-            // convert the job number part to an int
+            // get the job number and job
             jid = atoi(argv[1] + 1);
-
-            // get the job based on its job number
             job = getjobjid(jobs, jid);
 
             // check that the job exists
             if (job == NULL)
             {
-                // print error for non-existing job and return
                 printf("%s: No such job\n", argv[1]);
                 return;
             }
@@ -378,7 +370,6 @@ void do_bgfg(char **argv)
             // check that the job exists
             if (job == NULL)
             {
-                // print error for non-existing job and return
                 printf("(%s): No such process\n", argv[1]);
                 return;
             }
@@ -391,14 +382,14 @@ void do_bgfg(char **argv)
         }
 
         // check if the process is moving to the background or foreground
-        if (strcmp(argv[0], "fg"))
+        if (strcmp(argv[0], "bg") == 0)
         {
             // send the continue signal to the process
             if (kill(-(job->pid), SIGCONT) == 0)
             {
                 // change the job state to background
                 job->state = BG;
-                
+
                 // print a confirmation that the job is running
                 printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
             }
@@ -484,13 +475,13 @@ void sigchld_handler(int sig)
             // delete the job and print the confirmation
             if (deletejob(jobs, pid))
             {
-                better_write("Job [", 5);
-                write_int(jid);
-                better_write("] (", 3);
-                write_int(pid);
-                better_write(") terminated by signal ", 23);
-                write_int(WTERMSIG(status));
-                better_write("\n", 1);
+                safe_write("Job [", 5);
+                safe_write_int(jid);
+                safe_write("] (", 3);
+                safe_write_int(pid);
+                safe_write(") terminated by signal ", 23);
+                safe_write_int(WTERMSIG(status));
+                safe_write("\n", 1);
             }
         }
         // check if the process was stopped
@@ -503,13 +494,13 @@ void sigchld_handler(int sig)
             if (job != NULL)
             {
                 job->state = ST;
-                better_write("Job [", 5);
-                write_int(jid);
-                better_write("] (", 3);
-                write_int(pid);
-                better_write(") stopped by signal ", 20);
-                write_int(WSTOPSIG(status));
-                better_write("\n", 1);
+                safe_write("Job [", 5);
+                safe_write_int(jid);
+                safe_write("] (", 3);
+                safe_write_int(pid);
+                safe_write(") stopped by signal ", 20);
+                safe_write_int(WSTOPSIG(status));
+                safe_write("\n", 1);
             }
         }
     }
@@ -531,7 +522,7 @@ void sigint_handler(int sig)
         // send the interrupt signal to the process
         if (kill(-fg_pid, SIGINT) == -1)
         {
-            unix_error("Failed to interrupt"); // TODO should this be switched to something that is async-signal-safe
+            unix_error("Failed to interrupt");
         }
     }
 }
@@ -552,49 +543,52 @@ void sigtstp_handler(int sig)
         // send the stop signal to the process
         if (kill(-fg_pid, SIGTSTP) == -1)
         {
-            unix_error("Failed to stop"); // TODO should this be switched to something that is async-signal-safe
+            unix_error("Failed to stop");
         }
     }
 }
 
 // TODO are these 2 functions allowed & update comment:
 
-void better_write(char *str, int size)
+void safe_write(char *str, int size)
 {
+    // use write to safely print a message
     if (write(STDOUT_FILENO, str, size) == -1)
     {
-        unix_error("Write error"); // TODO should this be switched to something that is async-signal-safe
+        unix_error("Write error");
     }
 }
 
-void write_int(int value)
+void safe_write_int(int value)
 {
-    char buffer[20]; // Buffer to hold the string representation of the integer
-    int i = sizeof(buffer);
+    // buffer to hold the string
+    char buffer[20];
+    int i = 20;
 
-    // Handle 0 explicitly (as the loop won't run for value == 0)
+    // deal with 0
     if (value == 0)
     {
-        better_write("0", 1);
+        safe_write("0", 1);
         return;
     }
 
-    // Handle negative numbers
+    // check for negative
     if (value < 0)
     {
-        better_write("-", 1);
-        value = -value; // Make the value positive
+        // print the - and then convert to positive
+        safe_write("-", 1);
+        value = -value;
     }
 
-    // Convert the integer to a string in reverse order
+    // convert the integer to a string in reverse order
     while (value > 0 && i > 0)
     {
         buffer[--i] = '0' + (value % 10);
         value /= 10;
     }
 
-    // Write the string to stdout
-    better_write(buffer + i, sizeof(buffer) - i);
+    // safely print the string
+    safe_write(buffer + i, sizeof(buffer) - i);
 }
 
 /*********************
