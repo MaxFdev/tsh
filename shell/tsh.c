@@ -179,30 +179,36 @@ void eval(char *cmdline)
     char *argv[MAXARGS];
     int bg;
     pid_t pid;
-    // TODO sigset mask thing
-    // sigset_t mask;
+    sigset_t mask;
 
     // parse input and get bg indicator
     bg = parseline(cmdline, argv);
     if (argv[0] == NULL)
+    {
         return;
+    }
 
     // builtin cmd check
     if (!builtin_cmd(argv))
     {
-        // TODO handel signal stuff
-        // sigemptyset(&mask);
-        // sigaddset(&mask, SIGCHLD);
-        // sigprocmask(SIG_BLOCK, &mask, NULL);
+        // set up a signal block for SIGCHLD
+        if (sigemptyset(&mask) != 0)
+        {
+            unix_error("sigemptyset error");
+        }
+        if (sigaddset(&mask, SIGCHLD) != 0)
+        {
+            unix_error("sigaddset error");
+        }
+        if (sigprocmask(SIG_BLOCK, &mask, NULL) != 0)
+        {
+            unix_error("sigprocmask blocking error");
+        }
 
-        // TODO deal with forking
+        // fork the child process
         if ((pid = fork()) == 0)
         {
-            //     // Child process
-            //     // Unblock SIGCHLD
-            //     sigprocmask(SIG_UNBLOCK, &mask, NULL);
-
-            // Set new process group
+            // child process sets a new group id for itself
             setpgid(0, 0);
 
             // Execute the command
@@ -213,11 +219,14 @@ void eval(char *cmdline)
             }
         }
 
-        // // Unblock SIGCHLD
-        // sigprocmask(SIG_UNBLOCK, &mask, NULL);
-
         // add the job to the job list
         addjob(jobs, pid, bg ? BG : FG, cmdline);
+
+        // unblock SIGCHLD after the job is added
+        if (sigprocmask(SIG_UNBLOCK, &mask, NULL) != 0)
+        {
+            unix_error("sigprocmask unblocking error");
+        }
 
         // deal with background vs foreground
         if (!bg)
