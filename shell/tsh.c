@@ -64,8 +64,7 @@ void sigchld_handler(int sig);
 void sigtstp_handler(int sig);
 void sigint_handler(int sig);
 
-// TODO are these allowed:
-
+/* Custom function for writing safely */
 void safe_write(char *str, int size);
 void safe_write_int(int value);
 
@@ -557,8 +556,10 @@ void sigtstp_handler(int sig)
     }
 }
 
-// TODO are these 2 functions allowed & update comment:
-
+/*
+ * safe_write - Uses the write system call to print out messages in
+ *      an async-signal-safe way.
+ */
 void safe_write(char *str, int size)
 {
     // use write to safely print a message
@@ -568,36 +569,36 @@ void safe_write(char *str, int size)
     }
 }
 
+/*
+ * safe_write_int - On the fly calculates a string from a given int
+ *      and prints it using better print.
+ */
 void safe_write_int(int value)
 {
     // buffer to hold the string
     char buffer[20];
-    int i = 20;
-
-    // deal with 0
-    if (value == 0)
-    {
-        safe_write("0", 1);
-        return;
-    }
+    int i = 0;
 
     // check for negative
     if (value < 0)
     {
-        // print the - and then convert to positive
+        // print the '-' and convert to positive
         safe_write("-", 1);
         value = -value;
     }
 
     // convert the integer to a string in reverse order
-    while (value > 0 && i > 0)
+    do
     {
-        buffer[--i] = '0' + (value % 10);
+        buffer[i++] = '0' + (value % 10);
         value /= 10;
-    }
+    } while (value > 0);
 
-    // safely print the string
-    safe_write(buffer + i, sizeof(buffer) - i);
+    // safely print the string in reverse order
+    while (i > 0)
+    {
+        safe_write(&buffer[--i], 1);
+    }
 }
 
 /*********************

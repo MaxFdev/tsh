@@ -22,9 +22,9 @@ Running test04:
 ---
 > ./sdriver.pl -t trace04.txt -s ./tshref -a "-p"
 6c6
-< [1] (7602) ./myspin 1 &
+< [1] (8699) ./myspin 1 &
 ---
-> [1] (7600) ./myspin 1 &
+> [1] (8702) ./myspin 1 &
 
 Running test05:
 1c1
@@ -32,19 +32,19 @@ Running test05:
 ---
 > ./sdriver.pl -t trace05.txt -s ./tshref -a "-p"
 6c6
-< [1] (7646) ./myspin 2 &
+< [1] (8742) ./myspin 2 &
 ---
-> [1] (7652) ./myspin 2 &
+> [1] (8740) ./myspin 2 &
 8c8
-< [2] (7648) ./myspin 3 &
+< [2] (8746) ./myspin 3 &
 ---
-> [2] (7654) ./myspin 3 &
+> [2] (8744) ./myspin 3 &
 10,11c10,11
-< [1] (7646) Running ./myspin 2 &
-< [2] (7648) Running ./myspin 3 &
+< [1] (8742) Running ./myspin 2 &
+< [2] (8746) Running ./myspin 3 &
 ---
-> [1] (7652) Running ./myspin 2 &
-> [2] (7654) Running ./myspin 3 &
+> [1] (8740) Running ./myspin 2 &
+> [2] (8744) Running ./myspin 3 &
 
 Running test06:
 1c1
@@ -52,9 +52,9 @@ Running test06:
 ---
 > ./sdriver.pl -t trace06.txt -s ./tshref -a "-p"
 6c6
-< Job [1] (7694) terminated by signal 2
+< Job [1] (8802) terminated by signal 2
 ---
-> Job [1] (7691) terminated by signal 2
+> Job [1] (8799) terminated by signal 2
 
 Running test07:
 1c1
@@ -62,17 +62,17 @@ Running test07:
 ---
 > ./sdriver.pl -t trace07.txt -s ./tshref -a "-p"
 6c6
-< [1] (7749) ./myspin 4 &
+< [1] (8841) ./myspin 4 &
 ---
-> [1] (7753) ./myspin 4 &
+> [1] (8836) ./myspin 4 &
 8c8
-< Job [2] (7752) terminated by signal 2
+< Job [2] (8843) terminated by signal 2
 ---
-> Job [2] (7755) terminated by signal 2
+> Job [2] (8838) terminated by signal 2
 10c10
-< [1] (7749) Running ./myspin 4 &
+< [1] (8841) Running ./myspin 4 &
 ---
-> [1] (7753) Running ./myspin 4 &
+> [1] (8836) Running ./myspin 4 &
 
 Running test08:
 1c1
@@ -80,19 +80,19 @@ Running test08:
 ---
 > ./sdriver.pl -t trace08.txt -s ./tshref -a "-p"
 6c6
-< [1] (7796) ./myspin 4 &
+< [1] (8865) ./myspin 4 &
 ---
-> [1] (7801) ./myspin 4 &
+> [1] (8861) ./myspin 4 &
 8c8
-< Job [2] (7798) stopped by signal 20
+< Job [2] (8867) stopped by signal 20
 ---
-> Job [2] (7803) stopped by signal 20
+> Job [2] (8864) stopped by signal 20
 10,11c10,11
-< [1] (7796) Running ./myspin 4 &
-< [2] (7798) Stopped ./myspin 5 
+< [1] (8865) Running ./myspin 4 &
+< [2] (8867) Stopped ./myspin 5 
 ---
-> [1] (7801) Running ./myspin 4 &
-> [2] (7803) Stopped ./myspin 5 
+> [1] (8861) Running ./myspin 4 &
+> [2] (8864) Stopped ./myspin 5 
 
 Running test09:
 1c1
@@ -100,29 +100,29 @@ Running test09:
 ---
 > ./sdriver.pl -t trace09.txt -s ./tshref -a "-p"
 6c6
-< [1] (7836) ./myspin 4 &
+< [1] (8897) ./myspin 4 &
 ---
-> [1] (7838) ./myspin 4 &
+> [1] (8899) ./myspin 4 &
 8c8
-< Job [2] (7840) stopped by signal 20
+< Job [2] (8901) stopped by signal 20
 ---
-> Job [2] (7841) stopped by signal 20
+> Job [2] (8902) stopped by signal 20
 10,11c10,11
-< [1] (7836) Running ./myspin 4 &
-< [2] (7840) Stopped ./myspin 5 
+< [1] (8897) Running ./myspin 4 &
+< [2] (8901) Stopped ./myspin 5 
 ---
-> [1] (7838) Running ./myspin 4 &
-> [2] (7841) Stopped ./myspin 5 
+> [1] (8899) Running ./myspin 4 &
+> [2] (8902) Stopped ./myspin 5 
 13c13
-< [2] (7840) ./myspin 5 
+< [2] (8901) ./myspin 5 
 ---
-> [2] (7841) ./myspin 5 
+> [2] (8902) ./myspin 5 
 15,16c15,16
-< [1] (7836) Running ./myspin 4 &
-< [2] (7840) Running ./myspin 5 
+< [1] (8897) Running ./myspin 4 &
+< [2] (8901) Running ./myspin 5 
 ---
-> [1] (7838) Running ./myspin 4 &
-> [2] (7841) Running ./myspin 5 
+> [1] (8899) Running ./myspin 4 &
+> [2] (8902) Running ./myspin 5 
 
 Running test10:
 1c1
@@ -130,17 +130,17 @@ Running test10:
 ---
 > ./sdriver.pl -t trace10.txt -s ./tshref -a "-p"
 6c6
-< [1] (7867) ./myspin 4 &
+< [1] (8933) ./myspin 4 &
 ---
-> [1] (7868) ./myspin 4 &
+> [1] (8931) ./myspin 4 &
 8c8
-< Job [1] (7867) stopped by signal 20
+< Job [1] (8933) stopped by signal 20
 ---
-> Job [1] (7868) stopped by signal 20
+> Job [1] (8931) stopped by signal 20
 10c10
-< [1] (7867) Stopped ./myspin 4 &
+< [1] (8933) Stopped ./myspin 4 &
 ---
-> [1] (7868) Stopped ./myspin 4 &
+> [1] (8931) Stopped ./myspin 4 &
 
 Running test11:
 1c1
@@ -148,9 +148,9 @@ Running test11:
 ---
 > ./sdriver.pl -t trace11.txt -s ./tshref -a "-p"
 6c6
-< Job [1] (7896) terminated by signal 2
+< Job [1] (8960) terminated by signal 2
 ---
-> Job [1] (7897) terminated by signal 2
+> Job [1] (8964) terminated by signal 2
 
 Running test12:
 1c1
@@ -158,15 +158,13 @@ Running test12:
 ---
 > ./sdriver.pl -t trace12.txt -s ./tshref -a "-p"
 6c6
-< Job [1] (7920) stopped by signal 20
+< Job [1] (8987) stopped by signal 20
 ---
-> Job [1] (7921) stopped by signal 20
+> Job [1] (8986) stopped by signal 20
 8c8
-< [1] (7920) Stopped ./mysplit 4 
+< [1] (8987) Stopped ./mysplit 4 
 ---
-> [1] (7921) Stopped ./mysplit 4 
-60d59
-<    7932 pts/3    R      0:00 /bin/ps a
+> [1] (8986) Stopped ./mysplit 4 
 
 Running test13:
 1c1
@@ -174,15 +172,13 @@ Running test13:
 ---
 > ./sdriver.pl -t trace13.txt -s ./tshref -a "-p"
 6c6
-< Job [1] (7948) stopped by signal 20
+< Job [1] (9015) stopped by signal 20
 ---
-> Job [1] (7945) stopped by signal 20
+> Job [1] (9016) stopped by signal 20
 8c8
-< [1] (7948) Stopped ./mysplit 4 
+< [1] (9015) Stopped ./mysplit 4 
 ---
-> [1] (7945) Stopped ./mysplit 4 
-59d58
-<    7960 pts/3    R      0:00 /bin/ps a
+> [1] (9016) Stopped ./mysplit 4 
 
 Running test14:
 1c1
@@ -190,21 +186,21 @@ Running test14:
 ---
 > ./sdriver.pl -t trace14.txt -s ./tshref -a "-p"
 8c8
-< [1] (7985) ./myspin 4 &
+< [1] (9056) ./myspin 4 &
 ---
-> [1] (7986) ./myspin 4 &
+> [1] (9054) ./myspin 4 &
 24c24
-< Job [1] (7985) stopped by signal 20
+< Job [1] (9056) stopped by signal 20
 ---
-> Job [1] (7986) stopped by signal 20
+> Job [1] (9054) stopped by signal 20
 28c28
-< [1] (7985) ./myspin 4 &
+< [1] (9056) ./myspin 4 &
 ---
-> [1] (7986) ./myspin 4 &
+> [1] (9054) ./myspin 4 &
 30c30
-< [1] (7985) Running ./myspin 4 &
+< [1] (9056) Running ./myspin 4 &
 ---
-> [1] (7986) Running ./myspin 4 &
+> [1] (9054) Running ./myspin 4 &
 
 Running test15:
 1c1
@@ -212,43 +208,43 @@ Running test15:
 ---
 > ./sdriver.pl -t trace15.txt -s ./tshref -a "-p"
 8c8
-< Job [1] (8033) terminated by signal 2
+< Job [1] (9099) terminated by signal 2
 ---
-> Job [1] (8030) terminated by signal 2
+> Job [1] (9098) terminated by signal 2
 10c10
-< [1] (8041) ./myspin 3 &
+< [1] (9110) ./myspin 3 &
 ---
-> [1] (8039) ./myspin 3 &
+> [1] (9108) ./myspin 3 &
 12c12
-< [2] (8045) ./myspin 4 &
+< [2] (9114) ./myspin 4 &
 ---
-> [2] (8043) ./myspin 4 &
+> [2] (9112) ./myspin 4 &
 14,15c14,15
-< [1] (8041) Running ./myspin 3 &
-< [2] (8045) Running ./myspin 4 &
+< [1] (9110) Running ./myspin 3 &
+< [2] (9114) Running ./myspin 4 &
 ---
-> [1] (8039) Running ./myspin 3 &
-> [2] (8043) Running ./myspin 4 &
+> [1] (9108) Running ./myspin 3 &
+> [2] (9112) Running ./myspin 4 &
 17c17
-< Job [1] (8041) stopped by signal 20
+< Job [1] (9110) stopped by signal 20
 ---
-> Job [1] (8039) stopped by signal 20
+> Job [1] (9108) stopped by signal 20
 19,20c19,20
-< [1] (8041) Stopped ./myspin 3 &
-< [2] (8045) Running ./myspin 4 &
+< [1] (9110) Stopped ./myspin 3 &
+< [2] (9114) Running ./myspin 4 &
 ---
-> [1] (8039) Stopped ./myspin 3 &
-> [2] (8043) Running ./myspin 4 &
+> [1] (9108) Stopped ./myspin 3 &
+> [2] (9112) Running ./myspin 4 &
 24c24
-< [1] (8041) ./myspin 3 &
+< [1] (9110) ./myspin 3 &
 ---
-> [1] (8039) ./myspin 3 &
+> [1] (9108) ./myspin 3 &
 26,27c26,27
-< [1] (8041) Running ./myspin 3 &
-< [2] (8045) Running ./myspin 4 &
+< [1] (9110) Running ./myspin 3 &
+< [2] (9114) Running ./myspin 4 &
 ---
-> [1] (8039) Running ./myspin 3 &
-> [2] (8043) Running ./myspin 4 &
+> [1] (9108) Running ./myspin 3 &
+> [2] (9112) Running ./myspin 4 &
 
 Running test16:
 1c1
@@ -256,15 +252,15 @@ Running test16:
 ---
 > ./sdriver.pl -t trace16.txt -s ./tshref -a "-p"
 7c7
-< Job [1] (8075) stopped by signal 20
+< Job [1] (9146) stopped by signal 20
 ---
-> Job [1] (8078) stopped by signal 20
+> Job [1] (9147) stopped by signal 20
 9c9
-< [1] (8075) Stopped ./mystop 2
+< [1] (9146) Stopped ./mystop 2
 ---
-> [1] (8078) Stopped ./mystop 2
+> [1] (9147) Stopped ./mystop 2
 11c11
-< Job [2] (8088) terminated by signal 2
+< Job [2] (9155) terminated by signal 2
 ---
-> Job [2] (8090) terminated by signal 2
+> Job [2] (9156) terminated by signal 2
 
