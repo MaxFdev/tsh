@@ -65,6 +65,7 @@ void sigtstp_handler(int sig);
 void sigint_handler(int sig);
 
 /* Custom function for writing safely */
+
 void safe_write(char *str, int size);
 void safe_write_int(int value);
 
@@ -515,48 +516,6 @@ void sigchld_handler(int sig)
 }
 
 /*
- * sigint_handler - The kernel sends a SIGINT to the shell whenever the
- *    user types ctrl-c at the keyboard.  Catch it and send it along
- *    to the foreground job.
- */
-void sigint_handler(int sig)
-{
-    // get the current fg job's pid
-    pid_t fg_pid = fgpid(jobs);
-
-    // check that the process exists
-    if (fg_pid > 0)
-    {
-        // send the interrupt signal to the process
-        if (kill(-fg_pid, SIGINT) == -1)
-        {
-            unix_error("Failed to interrupt");
-        }
-    }
-}
-
-/*
- * sigtstp_handler - The kernel sends a SIGTSTP to the shell whenever
- *     the user types ctrl-z at the keyboard. Catch it and suspend the
- *     foreground job by sending it a SIGTSTP.
- */
-void sigtstp_handler(int sig)
-{
-    // get the current fg job's pid
-    pid_t fg_pid = fgpid(jobs);
-
-    // check that the process exists
-    if (fg_pid > 0)
-    {
-        // send the stop signal to the process
-        if (kill(-fg_pid, SIGTSTP) == -1)
-        {
-            unix_error("Failed to stop");
-        }
-    }
-}
-
-/*
  * safe_write - Uses the write system call to print out messages in
  *      an async-signal-safe way.
  */
@@ -565,7 +524,7 @@ void safe_write(char *str, int size)
     // use write to safely print a message
     if (write(STDOUT_FILENO, str, size) == -1)
     {
-        unix_error("Write error");
+        unix_error("write error");
     }
 }
 
@@ -598,6 +557,48 @@ void safe_write_int(int value)
     while (i > 0)
     {
         safe_write(&buffer[--i], 1);
+    }
+}
+
+/*
+ * sigint_handler - The kernel sends a SIGINT to the shell whenever the
+ *    user types ctrl-c at the keyboard.  Catch it and send it along
+ *    to the foreground job.
+ */
+void sigint_handler(int sig)
+{
+    // get the current fg job's pid
+    pid_t fg_pid = fgpid(jobs);
+
+    // check that the process exists
+    if (fg_pid > 0)
+    {
+        // send the interrupt signal to the process
+        if (kill(-fg_pid, SIGINT) == -1)
+        {
+            unix_error("failed to interrupt");
+        }
+    }
+}
+
+/*
+ * sigtstp_handler - The kernel sends a SIGTSTP to the shell whenever
+ *     the user types ctrl-z at the keyboard. Catch it and suspend the
+ *     foreground job by sending it a SIGTSTP.
+ */
+void sigtstp_handler(int sig)
+{
+    // get the current fg job's pid
+    pid_t fg_pid = fgpid(jobs);
+
+    // check that the process exists
+    if (fg_pid > 0)
+    {
+        // send the stop signal to the process
+        if (kill(-fg_pid, SIGTSTP) == -1)
+        {
+            unix_error("failed to stop");
+        }
     }
 }
 
