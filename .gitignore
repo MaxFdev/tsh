@@ -6,3 +6,6 @@ shell/myint
 shell/myspin
 shell/mysplit
 shell/mystop
+
+#  test results
+shell/results.txt
