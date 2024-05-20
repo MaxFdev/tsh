@@ -2,7 +2,7 @@
 tsh
 
 # compiled test code
-myint
-myspin
-mysplit
-mystop
+shell/myint
+shell/myspin
+shell/mysplit
+shell/mystop
